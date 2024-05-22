@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
                     mWebView.loadUrl(url);
                 } else {
                     mWebView.loadUrl(url + "/update");
+                    //mWebView.loadUrl(url); //for testing
                     mWebView.setVisibility(View.VISIBLE);
                 }
             }
