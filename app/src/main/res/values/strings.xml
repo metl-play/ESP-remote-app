@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name" translatable="false">ESP-remote-app</string>
+    <string name="version">Version</string>
+    <string name="update">Update</string>
+    <string name="btn_restart">Restart</string>
+    <string name="btn_force_shutdown">Force Shutdown</string>
+    <string name="btn_start_shutdown">Start/Shutdown</string>
+</resources>
