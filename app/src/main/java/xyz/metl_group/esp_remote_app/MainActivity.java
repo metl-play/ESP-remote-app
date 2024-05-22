@@ -2,7 +2,6 @@ package xyz.metl_group.esp_remote_app;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -166,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
             String deviceName = inputName.getText().toString();
             String deviceUrl = inputUrl.getText().toString();
             DeviceConfig newDevice = new DeviceConfig(deviceName, deviceUrl);
-            deviceManager.addDevice(new DeviceConfig(deviceName, deviceUrl));
+            deviceManager.addDevice(newDevice);
             adapter.notifyDataSetChanged();
             saveDevices();
         });
@@ -215,13 +214,15 @@ public class MainActivity extends AppCompatActivity {
 
             // Log response or handle it
             System.out.println(response);
+            System.out.println(responseCode);
 
         } catch (Exception e) {
+            //noinspection CallToPrintStackTrace
             e.printStackTrace();
         }
     }
 
-    public void onButtonClick(View view, int inputNumber) {
+    public void onButtonClick(int inputNumber) {
         DeviceConfig selectedDevice = deviceManager.getSelectedDevice();
         if (selectedDevice != null) {
             String url = selectedDevice.getUrl();
@@ -231,15 +232,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onStartShutdownClick(View view) {
-        onButtonClick(view, 1);
+        onButtonClick(1);
     }
 
     public void onRestartClick(View view) {
-        onButtonClick(view, 2);
+        onButtonClick(2);
     }
 
     public void onForceShutdownClick(View view) {
-        onButtonClick(view, 3);
+        onButtonClick(3);
     }
 
     @Override
