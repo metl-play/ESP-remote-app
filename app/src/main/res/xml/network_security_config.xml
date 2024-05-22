@@ -3,7 +3,6 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">localhost</domain>
         <domain includeSubdomains="true">192.168.0.0/16</domain>
-        <domain includeSubdomains="true">http://*.*</domain>
         <domain includeSubdomains="true">esp8266</domain>
         <domain includeSubdomains="true">esp8266.local</domain>
     </domain-config>

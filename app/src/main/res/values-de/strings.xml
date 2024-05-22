@@ -5,4 +5,5 @@
     <string name="btn_restart">Neustart</string>
     <string name="btn_force_shutdown">Ausschalten Erzwingen</string>
     <string name="btn_start_shutdown">Hoch/Herunterfahren</string>
+    <string name="btn_add_device">Gerät Hinzufügen</string>
 </resources>

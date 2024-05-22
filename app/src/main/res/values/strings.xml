@@ -5,4 +5,5 @@
     <string name="btn_restart">Restart</string>
     <string name="btn_force_shutdown">Force Shutdown</string>
     <string name="btn_start_shutdown">Start/Shutdown</string>
+    <string name="btn_add_device">Add Device</string>
 </resources>

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,6 +25,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,11 +35,14 @@ import androidx.activity.result.contract.ActivityResultContracts;
 
 
 public class MainActivity extends AppCompatActivity {
+    private static final String PREFS_NAME = "DevicePrefs";
+    private static final String KEY_DEVICES = "devices";
     private DeviceManager deviceManager;
     private ExecutorService executorService;
     private WebView mWebView;
     private ValueCallback<Uri[]> mFilePathCallback;
     private ActivityResultLauncher<Intent> filePickerLauncher;
+    private ArrayAdapter<DeviceConfig> adapter;
 
     @SuppressLint("SetJavaScriptEnabled")
 
@@ -46,14 +52,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         deviceManager = new DeviceManager();
-        deviceManager.addDevice(new DeviceConfig("ESP8266", "http://esp8266"));
+        loadDevices();
+        //deviceManager.addDevice(new DeviceConfig("ESP8266", "http://esp8266"));
 
-        deviceManager.selectDevice(0);
+        //deviceManager.selectDevice(0);
 
         executorService = Executors.newSingleThreadExecutor();
 
         Spinner deviceSpinner = findViewById(R.id.device_spinner);
-        ArrayAdapter<DeviceConfig> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, deviceManager.getDevices());
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, deviceManager.getDevices());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         deviceSpinner.setAdapter(adapter);
         deviceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -111,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         Button updateButton = findViewById(R.id.update_button);
         updateButton.setOnClickListener(v -> {
             DeviceConfig selectedDevice = deviceManager.getSelectedDevice();
@@ -121,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
                     mWebView.setVisibility(View.GONE);
                     mWebView.loadUrl(url);
                 } else {
-                    //mWebView.loadUrl(url);
                     mWebView.loadUrl(url + "/update");
                     mWebView.setVisibility(View.VISIBLE);
                 }
@@ -140,6 +145,55 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+
+        Button addDeviceButton = findViewById(R.id.add_device_button);
+        addDeviceButton.setOnClickListener(v -> showAddDeviceDialog());
+    }
+
+    private void showAddDeviceDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add Device");
+
+        View viewInflated = getLayoutInflater().inflate(R.layout.dialog_add_device, null);
+        final EditText inputName = viewInflated.findViewById(R.id.device_name);
+        final EditText inputUrl = viewInflated.findViewById(R.id.device_url);
+
+        builder.setView(viewInflated);
+
+        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            dialog.dismiss();
+            String deviceName = inputName.getText().toString();
+            String deviceUrl = inputUrl.getText().toString();
+            DeviceConfig newDevice = new DeviceConfig(deviceName, deviceUrl);
+            deviceManager.addDevice(new DeviceConfig(deviceName, deviceUrl));
+            adapter.notifyDataSetChanged();
+            saveDevices();
+        });
+        builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    private void saveDevices() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        Set<String> deviceSet = new HashSet<>();
+        for (DeviceConfig device : deviceManager.getDevices()) {
+            deviceSet.add(device.getName() + ";" + device.getUrl());
+        }
+        editor.putStringSet(KEY_DEVICES, deviceSet);
+        editor.apply();
+    }
+
+    private void loadDevices() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        Set<String> deviceSet = prefs.getStringSet(KEY_DEVICES, new HashSet<>());
+        for (String deviceString : deviceSet) {
+            String[] parts = deviceString.split(";");
+            if (parts.length == 2) {
+                deviceManager.addDevice(new DeviceConfig(parts[0], parts[1]));
+            }
+        }
     }
 
     private void sendHttpRequest(String url) {
@@ -192,4 +246,5 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         executorService.shutdown();
     }
+
 }
