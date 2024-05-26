@@ -4,20 +4,24 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.Spinner;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedReader;
@@ -29,10 +33,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-
-
 public class MainActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "DevicePrefs";
     private static final String KEY_DEVICES = "devices";
@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private ValueCallback<Uri[]> mFilePathCallback;
     private ActivityResultLauncher<Intent> filePickerLauncher;
     private ArrayAdapter<DeviceConfig> adapter;
+    private Spinner deviceSpinner;
 
     @SuppressLint("SetJavaScriptEnabled")
 
@@ -50,15 +51,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        deviceManager = new DeviceManager();
-        loadDevices();
-        //deviceManager.addDevice(new DeviceConfig("ESP8266", "http://esp8266"));
-
-        //deviceManager.selectDevice(0);
-
         executorService = Executors.newSingleThreadExecutor();
+        deviceManager = new DeviceManager();
+        //loadDevices();
+        executorService.execute(this::loadDevices);
+        Handler handler = new Handler(Looper.getMainLooper());
 
-        Spinner deviceSpinner = findViewById(R.id.device_spinner);
+        // Spinner for selecting devices
+        deviceSpinner = findViewById(R.id.device_spinner);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, deviceManager.getDevices());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         deviceSpinner.setAdapter(adapter);
@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 deviceManager.selectDevice(position);
+                mWebView.loadUrl(deviceManager.getSelectedDevice().getUrl());
             }
 
             @Override
@@ -74,17 +75,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Initialising the WebView
         mWebView = findViewById(R.id.webview);
         mWebView.setWebViewClient(new WebViewClient());
-        //mWebView.loadUrl("https://bing.com");
-        //mWebView.loadUrl(url);
 
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAllowFileAccess(true);
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
-        // Initialisiere den ActivityResultLauncher
+        // Initialising the ActivityResultLauncher
         filePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
 
+        // File Chooser for uploading new ESP-Remote Firmware to controller
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
@@ -117,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Button to enable the WebView with the link DeviceUrl/update
         Button updateButton = findViewById(R.id.update_button);
         updateButton.setOnClickListener(v -> {
             DeviceConfig selectedDevice = deviceManager.getSelectedDevice();
@@ -127,18 +129,20 @@ public class MainActivity extends AppCompatActivity {
                     mWebView.loadUrl(url);
                 } else {
                     mWebView.loadUrl(url + "/update");
-                    //mWebView.loadUrl(url); //for testing
-                    mWebView.setVisibility(View.VISIBLE);
+                    //mWebView.loadUrl(url); //url for testing purposes
+                    //mWebView.setVisibility(View.VISIBLE);
+                    handler.postDelayed(() -> mWebView.setVisibility(View.VISIBLE), 300);
                 }
             }
         });
 
+        // WebViewClient to handle the Version display
+        //ToDO: Make it load whenever a device is selected
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String finalUrl) {
                 super.onPageFinished(view, finalUrl);
-
-                // Hier wird der Button-Text Version ausgelesen und in einem Button in der App dargestellt
+                // Here the button text version is read out and displayed in a button in the app
                 mWebView.evaluateJavascript("document.querySelector('button[name=\"version\"]').innerText;", value -> {
                     Button versionButton = findViewById(R.id.version_button);
                     versionButton.setText(value.replace("\"", ""));
@@ -167,7 +171,8 @@ public class MainActivity extends AppCompatActivity {
             DeviceConfig newDevice = new DeviceConfig(deviceName, deviceUrl);
             deviceManager.addDevice(newDevice);
             adapter.notifyDataSetChanged();
-            saveDevices();
+            //saveDevices();
+            executorService.execute(this::saveDevices);
         });
         builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.cancel());
 
@@ -194,6 +199,14 @@ public class MainActivity extends AppCompatActivity {
                 deviceManager.addDevice(new DeviceConfig(parts[0], parts[1]));
             }
         }
+        if (!deviceManager.getDevices().isEmpty()) {
+            deviceManager.selectDevice(0);
+            deviceSpinner.setSelection(0);
+            //String url = deviceManager.getSelectedDevice().getUrl();
+            //mWebView.loadUrl(url);
+            runOnUiThread(() -> adapter.notifyDataSetChanged());
+        }
+        //runOnUiThread(() -> adapter.notifyDataSetChanged());
     }
 
     private void sendHttpRequest(String url) {
