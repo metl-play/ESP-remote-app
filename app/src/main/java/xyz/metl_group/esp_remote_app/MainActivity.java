@@ -129,15 +129,12 @@ public class MainActivity extends AppCompatActivity {
                     mWebView.loadUrl(url);
                 } else {
                     mWebView.loadUrl(url + "/update");
-                    //mWebView.loadUrl(url); //url for testing purposes
-                    //mWebView.setVisibility(View.VISIBLE);
                     handler.postDelayed(() -> mWebView.setVisibility(View.VISIBLE), 300);
                 }
             }
         });
 
         // WebViewClient to handle the Version display
-        //ToDO: Make it load whenever a device is selected
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String finalUrl) {
@@ -202,11 +199,8 @@ public class MainActivity extends AppCompatActivity {
         if (!deviceManager.getDevices().isEmpty()) {
             deviceManager.selectDevice(0);
             deviceSpinner.setSelection(0);
-            //String url = deviceManager.getSelectedDevice().getUrl();
-            //mWebView.loadUrl(url);
             runOnUiThread(() -> adapter.notifyDataSetChanged());
         }
-        //runOnUiThread(() -> adapter.notifyDataSetChanged());
     }
 
     private void sendHttpRequest(String url) {
