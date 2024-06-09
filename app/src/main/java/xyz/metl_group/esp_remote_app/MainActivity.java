@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -82,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAllowFileAccess(true);
+        //webSettings.setDomStorageEnabled(true);
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         // Initialising the ActivityResultLauncher
@@ -142,7 +144,12 @@ public class MainActivity extends AppCompatActivity {
                 // Here the button text version is read out and displayed in a button in the app
                 mWebView.evaluateJavascript("document.querySelector('button[name=\"version\"]').innerText;", value -> {
                     Button versionButton = findViewById(R.id.version_button);
-                    versionButton.setText(value.replace("\"", ""));
+                    if (!Objects.equals(value, "null")) {
+                        versionButton.setText(value.replace("\"", ""));
+                    }
+                    else {
+                        versionButton.setText(R.string.no_version);
+                        }
                 });
             }
         });
@@ -153,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void showAddDeviceDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add Device");
+        builder.setTitle(R.string.add_device);
 
         View viewInflated = getLayoutInflater().inflate(R.layout.dialog_add_device, null);
         final EditText inputName = viewInflated.findViewById(R.id.device_name);
@@ -172,7 +179,6 @@ public class MainActivity extends AppCompatActivity {
             executorService.execute(this::saveDevices);
         });
         builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.cancel());
-
         builder.show();
     }
 
@@ -223,9 +229,16 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(response);
             System.out.println(responseCode);
 
+            if (responseCode == 200) {
+                System.out.println("Who is a good response? I am!");
+            }
         } catch (Exception e) {
+            //ToDo: make "unexpected end of stream on com.android.okhttp" expected because the site doesn't have a continuous stream
             //noinspection CallToPrintStackTrace
             e.printStackTrace();
+
+            System.out.println(e.getMessage()+ " "+ url);
+            System.out.println("Bad Response! Do better!");
         }
     }
 
@@ -255,5 +268,4 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         executorService.shutdown();
     }
-
 }

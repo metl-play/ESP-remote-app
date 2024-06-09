@@ -6,4 +6,8 @@
     <string name="btn_force_shutdown">Ausschalten Erzwingen</string>
     <string name="btn_start_shutdown">Hoch/Herunterfahren</string>
     <string name="btn_add_device">Gerät Hinzufügen</string>
+    <string name="add_device">Gerät Hinzufügen</string>
+    <string name="device_name">Name</string>
+    <string name="device_url">Geräte URL (http://esp8266)</string>
+    <string name="no_version">Keine Version</string>
 </resources>

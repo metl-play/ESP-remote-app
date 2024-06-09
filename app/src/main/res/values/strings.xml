@@ -6,4 +6,8 @@
     <string name="btn_force_shutdown">Force Shutdown</string>
     <string name="btn_start_shutdown">Start/Shutdown</string>
     <string name="btn_add_device">Add Device</string>
+    <string name="add_device">Add Device</string>
+    <string name="device_url">Device URL (http://esp8266)</string>
+    <string name="device_name">Name</string>
+    <string name="no_version">no version</string>
 </resources>

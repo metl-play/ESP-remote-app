@@ -9,13 +9,15 @@
         android:id="@+id/device_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Device Name"
+        android:importantForAutofill="no"
+        android:hint="@string/device_name"
         android:inputType="text" />
 
     <EditText
         android:id="@+id/device_url"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Device URL"
+        android:hint="@string/device_url"
+        android:importantForAutofill="no"
         android:inputType="textUri" />
 </LinearLayout>
