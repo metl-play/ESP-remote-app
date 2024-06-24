@@ -209,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //ToDo: Maybe switch to another http client than okHttp
     private void sendHttpRequest(String url) {
         try {
             URL obj = new URL(url);
@@ -229,16 +230,12 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(response);
             System.out.println(responseCode);
 
-            if (responseCode == 200) {
-                System.out.println("Who is a good response? I am!");
-            }
         } catch (Exception e) {
             //ToDo: make "unexpected end of stream on com.android.okhttp" expected because the site doesn't have a continuous stream
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
 
-            System.out.println(e.getMessage()+ " "+ url);
-            System.out.println("Bad Response! Do better!");
+            //System.out.println(e.getMessage()+ " "+ url);
+            //System.out.println("Bad Response! Do better!");
+            {}
         }
     }
 
