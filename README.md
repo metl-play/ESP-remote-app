@@ -10,7 +10,7 @@ To-Do:
 - [x] Update deprecated Techniques to newer ones.
 - [x] Add custom App Icon
 - [ ] Maybe restrict device adresses so that online websites can't be used.
-- [-] Maybe fill the void with an Ad aslong the update site isn't shown.
+- [ ] ~~Maybe fill the void with an Ad aslong the update site isn't shown.~~ No!
 
 
 License is currently undecided, just credit me metl_play as the original creator of the provided code in this repository
