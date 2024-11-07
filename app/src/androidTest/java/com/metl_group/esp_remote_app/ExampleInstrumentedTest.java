@@ -1,4 +1,4 @@
-package xyz.metl_group.esp_remote_app;
+package com.metl_group.esp_remote_app;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("xyz.metl_group.esp_remote_app", appContext.getPackageName());
+        assertEquals("com.metl_group.esp_remote_app", appContext.getPackageName());
     }
 }

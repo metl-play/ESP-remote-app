@@ -1,4 +1,4 @@
-package xyz.metl_group.esp_remote_app;
+package com.metl_group.esp_remote_app;
 
 public class DeviceConfig {
     private String name;

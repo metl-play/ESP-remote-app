@@ -1,4 +1,4 @@
-package xyz.metl_group.esp_remote_app;
+package com.metl_group.esp_remote_app;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;

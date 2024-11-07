@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "xyz.metl_group.esp_remote_app"
+    namespace = "com.metl_group.esp_remote_app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "xyz.metl_group.esp_remote_app"
+        applicationId = "com.metl_group.esp_remote_app"
         minSdk = 27
         targetSdk = 34
         versionCode = 1
@@ -18,7 +18,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("debug")
         }

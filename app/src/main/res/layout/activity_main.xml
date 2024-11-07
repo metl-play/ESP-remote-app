@@ -8,7 +8,7 @@
     <Spinner
         android:id="@+id/device_spinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_margin="16dp"
         android:layout_centerHorizontal="true" />
 
@@ -49,8 +49,7 @@
         android:layout_margin="8dp"
         android:layout_centerHorizontal="true"
         android:text="@string/update"
-        android:layout_above="@+id/version_button"
-        android:onClick="onUpdateClick" />
+        android:layout_above="@+id/version_button" />
 
     <Button
         android:id="@+id/version_button"
